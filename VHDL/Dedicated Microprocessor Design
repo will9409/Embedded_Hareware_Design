@@ -1,0 +1,193 @@
+Library IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_ARITH.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+Entity lab_07 is
+
+	port(
+			clk    : IN STD_LOGIC ;
+			clear    : IN STD_LOGIC ;
+			state_out : out std_logic_vector(2 downto 0);
+			
+			x	: in std_logic_vector(3 downto 0);
+			y	: in std_logic_vector(3 downto 0);
+			
+			sub_out, load_out, x_NOT_y_out, out_sel_out : out std_logic;
+			out_x	: out std_logic_vector(3 downto 0)
+			
+			);
+
+END lab_07;
+
+Architecture behav of lab_07 is
+
+	component lab_07_cu
+	port (clk    : IN STD_LOGIC ;
+			load    : out STD_LOGIC ;
+			clear    : IN STD_LOGIC ;
+			out_sel	: out std_logic ;
+			sub	: out std_logic;
+			
+			x_NOT_y 	: in std_logic;
+			
+			state_out : out std_logic_vector(2 downto 0));
+	end component;
+	
+	component lab_07_dp
+	port (clk    : IN STD_LOGIC ;
+			load    : IN STD_LOGIC ;
+			clear    : IN STD_LOGIC ;
+			out_sel	: IN std_logic ;
+			x	: in std_logic_vector(3 downto 0);
+			y	: in std_logic_vector(3 downto 0);
+			sub : in std_logic;
+			
+			x_NOT_y 	: out std_logic;
+			out_x	: out std_logic_vector(3 downto 0));
+	end component;	
+
+	signal load, out_sel, sub, x_NOT_y : STD_LOGIC;
+	
+begin
+	U1 : lab_07_cu port map (clk, load, clear, out_sel, sub, x_NOT_y, state_out);
+	U2 : lab_07_dp port map (clk, load, clear, out_sel, x, y, sub, x_NOT_y, out_x);
+	
+	sub_out <= sub;
+	load_out <= load;
+	x_NOT_y_out <= x_NOT_y;
+	out_sel_out <= out_sel;
+end behav;
+
+
+Library IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_ARITH.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+Entity lab_07_cu is
+
+	port(
+			clk    : IN STD_LOGIC ;
+			load    : out STD_LOGIC ;
+			clear    : IN STD_LOGIC ;
+			out_sel	: out std_logic ;
+			sub	: out std_logic;
+			
+			x_NOT_y 	: in std_logic;
+			
+			state_out : out std_logic_vector(2 downto 0)
+			
+			);
+
+END lab_07_cu;
+
+Architecture behav of lab_07_cu is
+
+	signal state : std_logic_vector(2 downto 0) := "000";
+	
+begin
+   process(clear, clk) is
+			begin 
+			
+			if (clear = '1') then
+				-- load <= '0';
+				state <= "000";
+			--	sub <= '0';
+				
+			elsif (clk'EVENT AND clk = '1') then
+				state <= state + '1';
+				case(state) is
+					when "001" => 
+						-- load <= '1'; 
+					when "010" =>
+					when "011" => 
+						if (x_NOT_y = '0') then 
+							state <= "110";
+						-- else sub <= '1';
+						end if;
+					when "100" => 
+						-- sub <= '0'; 
+					when "101" => 
+						state <= "011";
+					when "110" => 
+					--	out_sel <= '1';
+					when others => state <= "001";	
+				end case;
+						
+			end if;	
+	end process;
+	state_out <= state;
+	load <= '1' when (state = "001") else '0';
+	sub <= '1' when (state = "011" AND x_NOT_y = '1') else '0';
+	out_sel <= '1' when (state = "110") else '0';
+end behav;
+
+
+Library IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_ARITH.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+Entity lab_07_dp is
+
+	port(
+			clk    : IN STD_LOGIC ;
+			load    : IN STD_LOGIC ;
+			clear    : IN STD_LOGIC ;
+			out_sel	: IN std_logic ;
+			x	: in std_logic_vector(3 downto 0);
+			y	: in std_logic_vector(3 downto 0);
+			sub : in std_logic;
+			
+			x_NOT_y 	: out std_logic;
+			out_x	: out std_logic_vector(3 downto 0)
+						
+			);
+
+END lab_07_dp;
+
+Architecture behav of lab_07_dp is
+
+	signal x_data : std_logic_vector(3 downto 0) := "0000";
+	signal y_data : std_logic_vector(3 downto 0) := "0000";
+	signal sub_1 : std_logic_vector(3 downto 0) := "0000";
+	signal sub_2 : std_logic_vector(3 downto 0) := "0000";
+	signal sub_out : std_logic_vector(3 downto 0) := "0000";
+
+	signal x_greater_y : std_logic := '0';
+begin
+		
+		process(clear, clk) is
+			begin 
+			
+			if (clear = '1') then
+            x_data <= "0000";
+				y_data <= "0000";
+							
+			elsif (clk'EVENT AND clk = '1') then
+				if (load = '1') then 
+					x_data <= x;
+					y_data <= y;
+				elsif (sub = '1') then
+					if (x_greater_y = '1') then 
+						x_data <= sub_out;
+					else
+						y_data <= sub_out;
+					end if;
+				end if;
+				
+			end if;	
+		end process;
+		
+		
+		x_greater_y <= '1' when (x_data > y_data) else '0';
+		sub_1 <= x_data when (x_greater_y = '1') else y_data;
+		sub_2 <= y_data when (x_greater_y = '1') else x_data;
+		
+		sub_out <= sub_1 - sub_2;
+		
+		x_NOT_y <= '0' when (x_data = y_data) else '1';
+		out_x <= x_data when (out_sel = '1') else "ZZZZ";
+		
+end behav;
