@@ -43,7 +43,7 @@ SH2:ShiftA GENERIC MAP ( N => 8 )
 							 Q => A ) ; -- A == Q
 							 
 							 
-							
+						
 	IPST: PROCESS(IClock, reset)
 	BEGIN
 	if(Reset = '1')THEN
