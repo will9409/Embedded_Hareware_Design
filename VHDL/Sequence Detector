@@ -1,0 +1,137 @@
+LIBRARY ieee ;
+USE ieee.std_logic_1164.all ;
+
+entity Lab_03 is
+	PORT (X1, X0, reset, clock : in std_logic;
+			St3, St0,St1,St2,rX,AD7,AC7 : out std_logic);
+END Lab_03;
+
+architecture MooreMachine of Lab_03 is
+TYPE state IS (S0, S1, S2, S3);
+TYPE state2 IS (Q0, Q1, Q2);
+TYPE cstate IS (CS0,CS1,CS2,CS3);
+SIGNAL Clock_state: cstate;
+SIGNAL Moore_state: state;
+SIGNAL Input_state: state2;
+SIGNAl X: STD_LOGIC := '0';
+SIGNAL  mclock : STD_LOGIC := '0';
+BEGIN
+	C_state: PROCESS(X1,X0,clock)
+	BEGIN
+	if(reset = '1')THEN
+		Clock_state<= CS0;
+		ELSIF(clock = '1' AND clock'event )THEN
+			CASE Clock_state IS
+				WHEN CS0 =>
+					if(clock= '1')THEN
+					Clock_state <= CS1;
+		
+         END IF;
+WHEN CS1 =>
+					if(X1 = '1' AND clock = '1')THEN
+					Clock_state <= CS2;
+					ELSIF(X0 = '1' AND clock = '1')THEN
+					Clock_state <= CS2;
+					ELSE
+					Clock_state <= CS1;
+					END IF;
+				WHEN CS2 =>
+				   if(X1 = '1' AND clock = '1')THEN
+					Clock_state <= CS3;
+					ELSIF(X0 = '1' AND clock = '1')THEN
+					Clock_state <= CS3;
+					ELSE
+					Clock_state <= CS3;
+					END IF;
+WHEN CS3 =>
+					if(X1 = '1' AND clock = '1')THEN
+					Clock_state <= CS3;
+					ELSIF(X0 = '1' AND clock = '1')THEN
+					Clock_state <= CS3;
+					ELSE
+					Clock_state <= CS0;
+					END IF;
+			END CASE;
+	END IF;
+	END PROCESS;
+  Input_STMC9: PROCESS(clock, reset)
+	BEGIN
+	if(reset = '1')THEN
+		Input_state <= Q0;
+		ELSIF(clock = '1' AND clock'event )THEN
+			CASE Input_state IS
+				WHEN Q0 =>
+					if(X1 = '1')THEN
+						Input_state <= Q1;
+					ELSIF(X0 = '1')THEN
+						Input_state <= Q2;
+					ELSE
+						Input_state <= Q0;
+					END IF;
+WHEN Q1 =>
+					IF(X0 = '1')THEN
+						Input_state <= Q1;
+					ELSIF(X1 = '1')THEN
+						Input_state <= Q2;
+					ELSE
+						Input_state <= Q0;
+					END IF;
+				WHEN Q2 =>
+					IF(X0 = '1')THEN
+						Input_state <= Q1;
+            ELSIF(X1 = '1')THEN
+						Input_state <= Q2;
+					ELSE
+						Input_state <= Q0;
+					END IF;
+			END CASE;
+		END IF;
+	END process;
+
+U_Moore: PROCESS(mclock, reset)
+	BEGIN
+	IF(RESET = '1')THEN
+		Moore_state <= S0;
+		ELSIF(mclock = '1' AND mclock'event )THEN
+			CASE Moore_state IS
+				WHEN S0 =>
+					IF X = '1' THEN
+						Moore_state <= S1;
+					ELSE
+						Moore_state <= S0;
+					END IF;
+          WHEN S1 =>
+					IF X = '0' THEN
+						Moore_state <= S2;
+					ELSE
+						Moore_state <= S1;
+					END IF;
+				WHEN S2 =>
+					IF X = '1' THEN
+						Moore_state <= S3;
+					ELSE
+						Moore_state <= S0;
+					END IF;
+          WHEN S3 =>
+					IF X = '0' THEN
+						Moore_state <= S2;
+					ELSE
+						Moore_state <= S1;
+					END IF;
+			END CASE;
+		END IF;
+	END PROCESS;
+  X <= '1' WHEN Input_state = Q1 ELSE
+		        '0' WHEN Input_state = Q2 ELSE
+				  'Z' WHEN Input_state = Q0;
+	rX <= '1' WHEN X = '1' ELSE '0';
+	St0 <= '1' WHEN Moore_state = S0 ELSE '0';
+  St1 <= '1' WHEN Moore_state = S1 ELSE '0';
+	St2 <= '1' WHEN Moore_state = S2 ELSE '0';
+	St3 <= '1' WHEN Moore_state = S3 ELSE '0';
+	mclock <= '1' WHEN Clock_state = CS2 ELSE '0';
+	AC7 <= '1' WHEN clock = '1' ELSE '0';
+	AD7 <= '1' WHEN Clock_state = CS2 ELSE '0';
+	
+end MooreMachine;
+	
