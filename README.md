@@ -1,4 +1,4 @@
-# Project Title
+# Embedded Hardware design
 
 One Paragraph of project description goes here
 
