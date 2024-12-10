@@ -4,7 +4,7 @@ State Machine 논리에 기반한 Control Unit과 Data Path를 VHDL로 구현한
 
 ## Running the tests
 
-<img src="https://gifmaker.me/video-to-gif/viewimage/20241209-12-OxA9tDidLZdjZx5K-J3avYG-HNET">
+
 
 
 ## Acknowledgments
