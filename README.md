@@ -4,7 +4,7 @@ State Machine 논리에 기반한 Control Unit과 Data Path를 VHDL로 구현한
 
 # State Diagram
 
-<img src="[https://user-images.githubusercontent.com/51365114/119627750-716f3100-be47-11eb-8e83-686b23c2c161.png](https://github.com/user-attachments/assets/5852f8b6-f8ca-4e86-b282-1dfa59d75a96)"  width="200" height="400"/>
+<img src="https://user-images.githubusercontent.com/51365114/119627750-716f3100-be47-11eb-8e83-686b23c2c161.png](https://github.com/user-attachments/assets/5852f8b6-f8ca-4e86-b282-1dfa59d75a96)"  width="400" height="300"/>
 
 ## Running the tests
 <img src="https://github.com/user-attachments/assets/a126e9f8-ff11-4af7-a339-3c734d6fec97">
